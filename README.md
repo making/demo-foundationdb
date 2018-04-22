@@ -1,13 +1,13 @@
 # Demo using FoundationDB + Spring WebFlux.fn
 
 
-Install fdb-client until [it's published to Maven Central](https://github.com/apple/foundationdb/issues/219)
+Install fdb-client locally until [it's published to Maven Central](https://github.com/apple/foundationdb/issues/219)
 
 ```
 mvn validate -P install-fdb
 ```
 
-[Install](https://apple.github.io/foundationdb/downloads.html) and [Start](](https://apple.github.io/foundationdb/administration.html#starting-and-stopping)) FoundationDB
+[Install](https://apple.github.io/foundationdb/downloads.html) and [start](https://apple.github.io/foundationdb/administration.html#starting-and-stopping) FoundationDB
 
 
 ```
