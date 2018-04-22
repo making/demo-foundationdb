@@ -55,7 +55,7 @@ public class HelloRouter {
 			tx.clear(Tuple.from(key).pack());
 			return CompletableFuture.completedFuture(null);
 		});
-		return ServerResponse.noContent()
-				.build(Mono.fromCompletionStage(clear).log("clear"));
+		return Mono.fromCompletionStage(clear).log("clear")
+				.then(ServerResponse.noContent().build());
 	}
 }
