@@ -18,7 +18,8 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 public class App {
 
 	static RouterFunction<ServerResponse> routes(Database database) {
-		return new HelloRouter(database).routes();
+		return new HelloRouter(database).routes()
+				.and(new ClassSchedulingRouter(database).routes());
 	}
 
 	public static void main(String[] args) throws Exception {
