@@ -67,10 +67,8 @@ public class ClassSchedulingRouter {
 					.doOnCancel(() -> {
 						emitter.complete();
 						repeat.set(false);
-					}).map(hasNext -> {
-						emitter.next(iterator.next());
-						return hasNext;
-					});
+					}) //
+					.doOnNext(hasNext -> emitter.next(iterator.next()));
 			emitter.onCancel(iterator::cancel);
 			return onHasNext.repeat(repeat::get).collectList().toFuture();
 		}));
