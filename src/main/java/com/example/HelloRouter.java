@@ -31,7 +31,7 @@ public class HelloRouter {
 		final String key = "hello";
 		CompletableFuture<byte[]> get = this.database
 				.readAsync(tx -> tx.get(Tuple.from(key).pack()));
-		return Mono.fromCompletionStage(get).log("get")
+		return Mono.fromFuture(get).log("get")
 				.map(result -> Tuple.fromBytes(result).getString(0)) //
 				.map(v -> "Hello " + v) //
 				.flatMap(body -> ServerResponse.ok().syncBody(body)) //
@@ -46,7 +46,7 @@ public class HelloRouter {
 					value -> tx.set(Tuple.from(key).pack(), Tuple.from(value).pack()))
 					.log("set").toFuture();
 		});
-		return ServerResponse.ok().body(Mono.fromCompletionStage(set), String.class);
+		return ServerResponse.ok().body(Mono.fromFuture(set), String.class);
 	}
 
 	Mono<ServerResponse> clear(ServerRequest req) {
@@ -55,7 +55,7 @@ public class HelloRouter {
 			tx.clear(Tuple.from(key).pack());
 			return CompletableFuture.completedFuture(null);
 		});
-		return Mono.fromCompletionStage(clear).log("clear")
+		return Mono.fromFuture(clear).log("clear")
 				.then(ServerResponse.noContent().build());
 	}
 }

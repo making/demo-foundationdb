@@ -63,7 +63,7 @@ public class ClassSchedulingRouter {
 			AsyncIterator<KeyValue> iterator = tx.getRange(Tuple.from("class").range())
 					.iterator();
 			AtomicBoolean repeat = new AtomicBoolean(true);
-			Mono<Boolean> onHasNext = Mono.fromCompletionStage(iterator.onHasNext()) //
+			Mono<Boolean> onHasNext = Mono.fromFuture(iterator.onHasNext()) //
 					.doOnCancel(() -> {
 						emitter.complete();
 						repeat.set(false);
@@ -87,14 +87,13 @@ public class ClassSchedulingRouter {
 		String className = req.pathVariable("class");
 		CompletableFuture<ServerResponse> res = this.database.runAsync(tx -> {
 			byte[] rec = Tuple.from("attends", student, className).pack();
-			return Mono.fromCompletionStage(tx.get(rec)) //
+			return Mono.fromFuture(tx.get(rec)) //
 					.log("signup:attends")
 					.flatMap(x -> ServerResponse.badRequest()
 							.syncBody("already signed up")) //
 					.switchIfEmpty(Mono.defer(() -> {
 						byte[] classKey = Tuple.from("class", className).pack();
-						Mono<Integer> seatsLeft = Mono
-								.fromCompletionStage(tx.get(classKey))
+						Mono<Integer> seatsLeft = Mono.fromFuture(tx.get(classKey))
 								.map(this::decodeInt) //
 								.log("signup:seats");
 						return seatsLeft.filter(seat -> seat > 0) //
@@ -110,7 +109,7 @@ public class ClassSchedulingRouter {
 										.badRequest().syncBody("No remaining seats")));
 					})).toFuture();
 		});
-		return Mono.fromCompletionStage(res);
+		return Mono.fromFuture(res);
 	}
 
 	/**
@@ -121,11 +120,11 @@ public class ClassSchedulingRouter {
 		String className = req.pathVariable("class");
 		CompletableFuture<ServerResponse> res = this.database.runAsync(tx -> {
 			byte[] rec = Tuple.from("attends", student, className).pack();
-			return Mono.fromCompletionStage(tx.get(rec)) //
+			return Mono.fromFuture(tx.get(rec)) //
 					.log("drop:attends") //
 					.flatMap(x -> {
 						byte[] classKey = Tuple.from("class", className).pack();
-						return Mono.fromCompletionStage(tx.get(classKey)) ///
+						return Mono.fromFuture(tx.get(classKey)) ///
 								.map(this::decodeInt) //
 								.map(seat -> seat + 1) //
 								.log("drop:seats") //
@@ -140,7 +139,7 @@ public class ClassSchedulingRouter {
 							.syncBody("not taking this class")))
 					.toFuture();
 		});
-		return Mono.fromCompletionStage(res);
+		return Mono.fromFuture(res);
 	}
 
 	/**
